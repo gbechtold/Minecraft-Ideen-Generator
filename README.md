@@ -24,7 +24,7 @@ These three elements combine to give you a unique building challenge, such as:
 
 ## Try It Out
 
-You can try the Minecraft Idea Generator here: [Live Demo](https://gbechtold.github.io//Minecraft-Ideen-Generator/index.html)
+You can try the Minecraft Idea Generator here: [Live Demo](https://gbechtold.github.io//Minecraft-Ideen-Generator/)
 
 ## Usage Rights
 
