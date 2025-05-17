@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Ideengenerator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #272b45;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="50" height="50" fill="%23242640"/><rect x="50" y="50" width="50" height="50" fill="%23242640"/><rect x="50" y="0" width="50" height="50" fill="%2322233b"/><rect x="0" y="50" width="50" height="50" fill="%2322233b"/></svg>');
+            background-size: 40px 40px;
+        }
+        .container {
+            background-color: #20233b;
+            border: 0;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            color: #42edc6;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.7);
+            font-family: 'Minecraft', 'Segoe UI', Tahoma, sans-serif;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .title-emoji {
+            font-size: 1.3em;
+        }
+        .slot-labels {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .slot-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffdd33;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 0;
+        }
+        .slot-machine {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: linear-gradient(to bottom, #2f3457, #242942);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 0;
+            position: relative;
+        }
+        .slot-window {
+            position: relative;
+            height: 130px;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #2a3050, #1e1f35);
+            border-radius: 15px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 4px solid #ff7b5a;
+        }
+        .scroll-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .slot-reel {
+            position: absolute;
+            width: 100%;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .slot-item {
+            width: 100%;
+            height: 130px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            gap: 10px;
+        }
+        .slot-emoji {
+            font-size: 36px;
+            margin-right: 5px;
+        }
+        .spielstil {
+            background: linear-gradient(to bottom, #ffb0be, #ff7a94);
+        }
+        .thema {
+            background: linear-gradient(to bottom, #80ffe6, #42edc6);
+        }
+        .baustein {
+            background: linear-gradient(to bottom, #90b8ff, #5a9cff);
+        }
+        .light-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .bottom-light {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to top, rgba(255,255,255,0.3), transparent);
+            pointer-events: none;
+            z-index: 10;
+        }
+        .handle {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(to bottom, #ff5a7e, #ff3355);
+            border: 3px solid #ff2244;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+        .handle:hover {
+            background: linear-gradient(to bottom, #ff6b8e, #ff4466);
+            box-shadow: 0 0 15px rgba(255, 90, 126, 0.6);
+        }
+        .handle::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 25px;
+            background-color: #ffdd33;
+            border: 3px solid #ffbb00;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 221, 51, 0.7);
+        }
+        .handle.pulled {
+            transform: translateY(-30%);
+        }
+        .winning {
+            animation: winPulse 0.7s infinite alternate;
+        }
+        @keyframes winPulse {
+            0% { 
+                box-shadow: 0 0 20px 5px rgba(255, 221, 51, 0.3);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 30px 10px rgba(255, 221, 51, 0.7); 
+                transform: scale(1.05);
+            }
+        }
+        @keyframes flashingLights {
+            0% { box-shadow: 0 0 15px #ffdd33; }
+            25% { box-shadow: 0 0 15px #ff5a7e; }
+            50% { box-shadow: 0 0 15px #42edc6; }
+            75% { box-shadow: 0 0 15px #5a9cff; }
+            100% { box-shadow: 0 0 15px #ffdd33; }
+        }
+        @keyframes confetti {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+        .jackpot {
+            animation: flashingLights 1s infinite;
+        }
+        .confetti-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="20" cy="20" r="5" fill="%23ffdd33"/><rect x="40" y="40" width="10" height="10" fill="%23ff5a7e"/><polygon points="70,70 80,70 75,80" fill="%2342edc6"/><rect x="10" y="70" width="8" height="8" transform="rotate(45)" fill="%235a9cff"/><circle cx="80" cy="20" r="7" fill="%23ff6bff"/></svg>');
+            animation: confetti 2s linear infinite;
+            pointer-events: none;
+            opacity: 0.7;
+            z-index: 100;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        button {
+            background: linear-gradient(to bottom, #5a9cff, #4a7ad0);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+        button:hover {
+            background: linear-gradient(to bottom, #6aacff, #5a8ae0);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+        #resetBtn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            padding: 10px 15px;
+            box-shadow: none;
+        }
+        #resetBtn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: none;
+            box-shadow: none;
+        }
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #343c5c;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 18px;
+            min-height: 80px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 3px solid #4a5179;
+            line-height: 1.6;
+        }
+        .result-header {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #42edc6;
+        }
+        .result-item {
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+        .coins {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ffdd33;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            box-shadow: 0 0 5px rgba(255, 221, 51, 0.8);
+        }
+        .result-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .result-box {
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .result-box-spielstil {
+            background-color: rgba(255, 122, 148, 0.3);
+        }
+        .result-box-thema {
+            background-color: rgba(66, 237, 198, 0.3);
+        }
+        .result-box-baustein {
+            background-color: rgba(90, 156, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="title-emoji">🎮</span>
+            Minecraft Ideengenerator
+            <span class="title-emoji">⚒️</span>
+        </h1>
+        
+        <div class="slot-labels">
+            <div class="slot-label">KONTEXT</div>
+            <div class="slot-label">THEMA / MATERIAL</div>
+            <div class="slot-label">GRUNDBAUSTEIN</div>
+        </div>
+        
+        <div class="slot-machine">
+            <div class="slot-window">
+                <div class="light-effect"></div>
+                <div class="bottom-light"></div>
+                <div class="scroll-container">
+                    <div class="slot-reel" id="reel1"></div>
+                </div>
+            </div>
+            <div class="slot-window">
+                <div class="light-effect"></div>
+                <div class="bottom-light"></div>
+                <div class="scroll-container">
+                    <div class="slot-reel" id="reel2"></div>
+                </div>
+            </div>
+            <div class="slot-window">
+                <div class="light-effect"></div>
+                <div class="bottom-light"></div>
+                <div class="scroll-container">
+                    <div class="slot-reel" id="reel3"></div>
+                </div>
+            </div>
+            <div class="handle" id="handle"></div>
+        </div>
+        
+        <div class="result" id="result">
+            <span class="result-header">🎲 Ziehe am Hebel oder klicke auf "Neue Idee generieren"! 🎲</span>
+        </div>
+        <div class="confetti-overlay" id="confetti"></div>
+        <div class="buttons">
+            <button id="spinBtn">🎮 Neue Idee generieren</button>
+            <button id="resetBtn">🔄 Zurücksetzen</button>
+        </div>
+    </div>
+
+    <script>
+        // Listen mit verschiedenen Kategorien für jeden Slot
+        const kontextListe = [
+            { name: "Survival", emoji: "🌲" },
+            { name: "Kreativ", emoji: "✨" },
+            { name: "Wüste", emoji: "🏜️" },
+            { name: "Ozean", emoji: "🌊" },
+            { name: "Berge", emoji: "⛰️" },
+            { name: "Nether", emoji: "🔥" },
+            { name: "End", emoji: "🌌" },
+            { name: "Dschungel", emoji: "🌴" },
+            { name: "Taiga", emoji: "❄️" },
+            { name: "Savanne", emoji: "🦒" },
+            { name: "Sumpf", emoji: "🦠" },
+            { name: "Pilzland", emoji: "🍄" },
+            { name: "Höhle", emoji: "🕳️" },
+            { name: "Himmel", emoji: "☁️" },
+            { name: "Unterwasser", emoji: "🐙" },
+            { name: "Vulkan", emoji: "🌋" },
+            { name: "Eiswelt", emoji: "❄️" },
+            { name: "Unterirdisch", emoji: "⛏️" },
+            { name: "Schwebend", emoji: "🎈" },
+            { name: "Weltraum", emoji: "🚀" },
+            { name: "Peaceful", emoji: "🕊️" },
+            { name: "Hardcore", emoji: "💀" },
+            { name: "PvP", emoji: "⚔️" },
+            { name: "Adventure", emoji: "🗺️" },
+            { name: "Skyblock", emoji: "☁️" },
+            { name: "One-Block", emoji: "🧊" },
+            { name: "Dorf", emoji: "🏘️" },
+            { name: "Insel", emoji: "🏝️" },
+            { name: "Kristallhöhle", emoji: "💎" },
+            { name: "Mesa", emoji: "🧱" }
+        ];
+
+        const themaListe = [
+            { name: "Redstone", emoji: "🔴" },
+            { name: "Wasser", emoji: "💧" },
+            { name: "Lava", emoji: "🌋" },
+            { name: "TNT", emoji: "💥" },
+            { name: "Schafe", emoji: "🐑" },
+            { name: "Dorfbewohner", emoji: "👨‍🌾" },
+            { name: "Drachen", emoji: "🐉" },
+            { name: "Golems", emoji: "🗿" },
+            { name: "Slimes", emoji: "🟢" },
+            { name: "Bienen", emoji: "🐝" },
+            { name: "Nether", emoji: "🌀" },
+            { name: "Enderman", emoji: "👁️" },
+            { name: "Glowstone", emoji: "✨" },
+            { name: "Kettenkommando", emoji: "🔗" },
+            { name: "Bambus", emoji: "🎋" },
+            { name: "Buntglas", emoji: "🌈" },
+            { name: "Automatik", emoji: "🤖" },
+            { name: "Netherit", emoji: "⬛" },
+            { name: "Schwerkraft", emoji: "🧲" },
+            { name: "Flugmaschine", emoji: "✈️" },
+            { name: "Obsidian", emoji: "🟪" },
+            { name: "Symmetrisch", emoji: "⚖️" },
+            { name: "Unterwasser", emoji: "🐙" },
+            { name: "Schwebend", emoji: "☁️" },
+            { name: "Eis", emoji: "❄️" },
+            { name: "Korallen", emoji: "🐚" },
+            { name: "Musikblöcke", emoji: "🎵" },
+            { name: "Wolle", emoji: "🧶" },
+            { name: "Pilze", emoji: "🍄" },
+            { name: "Diamant", emoji: "💎" }
+        ];
+
+        const bausteinListe = [
+            { name: "Farm", emoji: "🌾" },
+            { name: "Basis", emoji: "🏠" },
+            { name: "Burg", emoji: "🏰" },
+            { name: "Höhle", emoji: "🕳️" },
+            { name: "Labor", emoji: "🧪" },
+            { name: "Tempel", emoji: "🛕" },
+            { name: "Arena", emoji: "🏟️" },
+            { name: "Turm", emoji: "🗼" },
+            { name: "Brücke", emoji: "🌉" },
+            { name: "Statue", emoji: "🗿" },
+            { name: "Labyrinth", emoji: "🧩" },
+            { name: "Bunker", emoji: "🚪" },
+            { name: "Mine", emoji: "⛏️" },
+            { name: "Bahnhof", emoji: "🚆" },
+            { name: "Museum", emoji: "🖼️" },
+            { name: "Bibliothek", emoji: "📚" },
+            { name: "Zoo", emoji: "🦁" },
+            { name: "Aquarium", emoji: "🐠" },
+            { name: "Leuchtturm", emoji: "🔦" },
+            { name: "Baumhaus", emoji: "🌳" },
+            { name: "Dorf", emoji: "🏘️" },
+            { name: "Schule", emoji: "🏫" },
+            { name: "Hotel", emoji: "🏨" },
+            { name: "Portal", emoji: "🌀" },
+            { name: "Automaten", emoji: "🎰" },
+            { name: "Verstecke", emoji: "🕵️" },
+            { name: "Mechanismen", emoji: "⚙️" },
+            { name: "Kanonen", emoji: "💣" },
+            { name: "Wüstenoase", emoji: "🏜️" },
+            { name: "Fallen", emoji: "⚔️" }
+        ];
+
+        // DOM-Elemente
+        const reel1 = document.getElementById('reel1');
+        const reel2 = document.getElementById('reel2');
+        const reel3 = document.getElementById('reel3');
+        const result = document.getElementById('result');
+        const spinBtn = document.getElementById('spinBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const handle = document.getElementById('handle');
+        const confetti = document.getElementById('confetti');
+
+        // Slotmaschinen-Status
+        let isSpinning = false;
+        
+        // Zufällige Winning-Animationen
+        const winAnimations = [
+            'jackpot',
+            'winning',
+            'confetti'
+        ];
+
+        // Funktion zum zufälligen Auswählen eines Elements aus einer Liste
+        function getRandomItem(list) {
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        // Funktion zum Durchmischen einer Liste (Fisher-Yates-Algorithmus)
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Erstellen der Slot-Rollen
+        function createReels() {
+            // Mische die Listen für jeden Durchlauf
+            const shuffledKontext = shuffleArray(kontextListe);
+            const shuffledThema = shuffleArray(themaListe);
+            const shuffledBaustein = shuffleArray(bausteinListe);
+            
+            // Reel 1 - Kontext
+            reel1.innerHTML = '';
+            for (let i = 0; i < 3; i++) { // Füge mehrere Kopien der Liste ein
+                shuffledKontext.forEach(item => {
+                    const slotItem = document.createElement('div');
+                    slotItem.className = 'slot-item spielstil';
+                    slotItem.innerHTML = `<span class="slot-emoji">${item.emoji}</span>${item.name}`;
+                    reel1.appendChild(slotItem);
+                });
+            }
+            
+            // Reel 2 - Thema/Material
+            reel2.innerHTML = '';
+            for (let i = 0; i < 3; i++) { // Füge mehrere Kopien der Liste ein
+                shuffledThema.forEach(item => {
+                    const slotItem = document.createElement('div');
+                    slotItem.className = 'slot-item thema';
+                    slotItem.innerHTML = `<span class="slot-emoji">${item.emoji}</span>${item.name}`;
+                    reel2.appendChild(slotItem);
+                });
+            }
+            
+            // Reel 3 - Grundbaustein
+            reel3.innerHTML = '';
+            for (let i = 0; i < 3; i++) { // Füge mehrere Kopien der Liste ein
+                shuffledBaustein.forEach(item => {
+                    const slotItem = document.createElement('div');
+                    slotItem.className = 'slot-item baustein';
+                    slotItem.innerHTML = `<span class="slot-emoji">${item.emoji}</span>${item.name}`;
+                    reel3.appendChild(slotItem);
+                });
+            }
+        }
+
+        // Zurücksetzen der Rollen ohne Animation
+        function resetReels(animate = true) {
+            // Erstelle die Rollen neu
+            createReels();
+            
+            const duration = animate ? '1s' : '0s';
+            
+            // Setze die Transition
+            reel1.style.transition = `transform ${duration} ease-out`;
+            reel2.style.transition = `transform ${duration} ease-out`;
+            reel3.style.transition = `transform ${duration} ease-out`;
+            
+            // Positioniere die Slots so, dass ein Element genau in der Mitte ist
+            const initialOffset = 130; // Höhe eines Elements
+            reel1.style.transform = `translateY(-${initialOffset}px)`;
+            reel2.style.transform = `translateY(-${initialOffset}px)`;
+            reel3.style.transform = `translateY(-${initialOffset}px)`;
+        }
+
+        // Spin-Animation starten
+        function startSpin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            // Reset winning effects
+            resetWinningEffects();
+            
+            // Play handle animation
+            handle.classList.add('pulled');
+            setTimeout(() => {
+                handle.classList.remove('pulled');
+            }, 300);
+            
+            // Erstelle neue Rollen mit zufälligen Ergebnissen
+            createReels();
+            
+            // Bestimme zufällige Endpositionen für jede Rolle
+            const finalPosition1 = Math.floor(Math.random() * kontextListe.length);
+            const finalPosition2 = Math.floor(Math.random() * themaListe.length);
+            const finalPosition3 = Math.floor(Math.random() * bausteinListe.length);
+            
+            // Setze Rollen zurück auf Anfangsposition
+            reel1.style.transition = 'none';
+            reel2.style.transition = 'none';
+            reel3.style.transition = 'none';
+            
+            // Positioniere die Rollen am Anfang
+            reel1.style.transform = 'translateY(0)';
+            reel2.style.transform = 'translateY(0)';
+            reel3.style.transform = 'translateY(0)';
+            
+            // Force reflow
+            void reel1.offsetWidth;
+            void reel2.offsetWidth;
+            void reel3.offsetWidth;
+            
+            // Berechne die Endpositionen mit einer sicheren Methode
+            const endPos1 = -((finalPosition1 + (kontextListe.length * 2)) * 130);
+            const endPos2 = -((finalPosition2 + (themaListe.length * 2)) * 130);
+            const endPos3 = -((finalPosition3 + (bausteinListe.length * 2)) * 130);
+            
+            // Animiere die Rollen mit unterschiedlicher Geschwindigkeit
+            setTimeout(() => {
+                reel1.style.transition = 'transform 3s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                reel1.style.transform = `translateY(${endPos1}px)`;
+            }, 0);
+            
+            setTimeout(() => {
+                reel2.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                reel2.style.transform = `translateY(${endPos2}px)`;
+            }, 300);
+            
+            setTimeout(() => {
+                reel3.style.transition = 'transform 4s cubic-bezier(0.1, 0.7, 0.1, 1)';
+                reel3.style.transform = `translateY(${endPos3}px)`;
+            }, 600);
+            
+            // Zeige die Ergebnisse nach dem Spin an
+            setTimeout(() => {
+                const results = [
+                    kontextListe[finalPosition1],
+                    themaListe[finalPosition2],
+                    bausteinListe[finalPosition3]
+                ];
+                showResults(results);
+            }, 4500);
+        }
+
+        // Zeige die Ergebnisse an
+        function showResults(results) {
+            // Erstelle den Ergebnistext
+            let ideaText = `<div class="result-header">🎯 Deine Minecraft-Idee:</div>`;
+            
+            // Kombiniere die Ergebnisse zu einer Bauanleitung
+            ideaText += `<div class="result-item" style="font-size: 1.2em;">
+                         Baue in ${results[0].emoji} <b>${results[0].name}</b> eine 
+                         ${results[1].emoji} <b>${results[1].name}</b>-basierte
+                         ${results[2].emoji} <b>${results[2].name}</b>-Konstruktion!</div>`;
+            
+            // Füge die Ergebnis-Boxen hinzu
+            ideaText += `<div class="result-items">
+                <div class="result-box result-box-spielstil">${results[0].emoji} ${results[0].name}</div>
+                <div class="result-box result-box-thema">${results[1].emoji} ${results[1].name}</div>
+                <div class="result-box result-box-baustein">${results[2].emoji} ${results[2].name}</div>
+            </div>`;
+            
+            // Zufällige Gewinnchance
+            const winningChance = Math.random();
+            
+            // Wenn alle Slots gleich sind (extrem unwahrscheinlich) oder zufälliger Jackpot (5% Chance)
+            if ((results[0].name === results[1].name && results[1].name === results[2].name) || winningChance < 0.05) {
+                ideaText = `<div class="result-header" style="font-size: 1.4em; color: #ffdd33;">🎉 SUPER-IDEE! 🎉</div>
+                           <div class="result-item" style="font-size: 1.2em;">
+                           Baue in ${results[0].emoji} <b>${results[0].name}</b> eine 
+                           ${results[1].emoji} <b>${results[1].name}</b>-basierte
+                           ${results[2].emoji} <b>${results[2].name}</b>-Konstruktion!</div>
+                           <div style="margin-top: 15px; font-style: italic; color: #ffdd33;">Diese Kombination ist selten und besonders kreativ!</div>
+                           
+                           <div class="result-items">
+                                <div class="result-box result-box-spielstil">${results[0].emoji} ${results[0].name}</div>
+                                <div class="result-box result-box-thema">${results[1].emoji} ${results[1].name}</div>
+                                <div class="result-box result-box-baustein">${results[2].emoji} ${results[2].name}</div>
+                            </div>`;
+                
+                // Auslösen einer Winning-Animation bei Jackpot
+                const animation = getRandomItem(winAnimations);
+                
+                if (animation === 'jackpot') {
+                    // Jackpot-Animation
+                    document.querySelectorAll('.slot-window').forEach(window => {
+                        window.classList.add('jackpot');
+                    });
+                    createCoins();
+                } else if (animation === 'winning') {
+                    // Winning-Effekt
+                    document.querySelectorAll('.slot-window').forEach(window => {
+                        window.classList.add('winning');
+                    });
+                } else if (animation === 'confetti') {
+                    // Confetti-Animation
+                    confetti.style.display = 'block';
+                }
+            }
+            
+            result.innerHTML = ideaText;
+            isSpinning = false;
+        }
+
+        // Zurücksetzen der Gewinneffekte
+        function resetWinningEffects() {
+            document.querySelectorAll('.slot-window').forEach(window => {
+                window.classList.remove('jackpot', 'winning');
+            });
+            confetti.style.display = 'none';
+            
+            // Entferne alle Coin-Elemente
+            document.querySelectorAll('.coins').forEach(coin => {
+                coin.remove();
+            });
+        }
+
+        // Coins für Jackpot-Animation erstellen
+        function createCoins() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const coin = document.createElement('div');
+                    coin.className = 'coins';
+                    coin.style.left = Math.random() * 80 + 10 + '%';
+                    coin.style.top = '0';
+                    
+                    document.querySelector('.container').appendChild(coin);
+                    
+                    // Animiere das Fallen
+                    coin.style.transition = `top ${Math.random() * 2 + 2}s ease-in, left ${Math.random() * 2 + 2}s ease-out, opacity 0.2s`;
+                    setTimeout(() => {
+                        coin.style.opacity = '1';
+                        coin.style.top = Math.random() * 70 + 30 + '%';
+                        coin.style.left = parseFloat(coin.style.left) + (Math.random() * 20 - 10) + '%';
+                    }, 50);
+                    
+                    // Entferne den Coin nach der Animation
+                    setTimeout(() => {
+                        coin.style.opacity = '0';
+                        setTimeout(() => {
+                            coin.remove();
+                        }, 200);
+                    }, Math.random() * 2000 + 1500);
+                }, i * 100);
+            }
+        }
+        
+        // Initialisiere die Reels beim Laden
+        window.addEventListener('load', () => {
+            createReels();
+            
+            // Initialisiere ohne Animation - warte einen Moment
+            setTimeout(() => {
+                reel1.style.transition = 'none';
+                reel2.style.transition = 'none';
+                reel3.style.transition = 'none';
+                
+                // Positioniere die Slots so, dass ein Element genau in der Mitte ist
+                const initialOffset = 130; // Höhe eines Elements
+                reel1.style.transform = `translateY(-${initialOffset}px)`;
+                reel2.style.transform = `translateY(-${initialOffset}px)`;
+                reel3.style.transform = `translateY(-${initialOffset}px)`;
+            }, 100);
+        });
+
+        // Event-Listener für den Spin-Button
+        spinBtn.addEventListener('click', startSpin);
+        
+        // Event-Listener für den Hebel
+        handle.addEventListener('click', startSpin);
+        
+        // Event-Listener für den Reset-Button
+        resetBtn.addEventListener('click', () => {
+            resetWinningEffects();
+            resetReels();
+            result.innerHTML = '<span class="result-header">🎲 Ziehe am Hebel oder klicke auf "Neue Idee generieren"! 🎲</span>';
+        });
+    </script>
+</body>
+</html>
