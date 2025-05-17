@@ -2,7 +2,6 @@
 
 A fun slot machine style generator that creates random Minecraft build ideas by combining different contexts, themes, and building types.
 
-![Minecraft Idea Generator Preview](https://api.placeholder.com/800/400?text=Minecraft+Idea+Generator)
 
 ## Features
 
