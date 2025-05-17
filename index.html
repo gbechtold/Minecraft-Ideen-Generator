@@ -63,6 +63,13 @@
             border-radius: 10px;
             margin-bottom: 0;
         }
+        .slot-label-info {
+            display: block;
+            font-size: 11px;
+            opacity: 0.9;
+            font-weight: normal;
+            margin-top: 4px;
+        }
         .slot-machine {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -236,14 +243,29 @@
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .keyboard-shortcut {
+            font-size: 14px;
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 5px;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         button:hover {
             background: linear-gradient(to bottom, #6aacff, #5a8ae0);
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
         }
-        button:active {
-            transform: translateY(1px);
+        button:active, button.active {
+            transform: scale(0.95);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3);
         }
         #resetBtn {
@@ -323,7 +345,10 @@
         </h1>
         
         <div class="slot-labels">
-            <div class="slot-label">KONTEXT</div>
+            <div class="slot-label">
+                KONTEXT
+                <span class="slot-label-info">Biomtyp, Ort, Spielmodus</span>
+            </div>
             <div class="slot-label">THEMA / MATERIAL</div>
             <div class="slot-label">GRUNDBAUSTEIN</div>
         </div>
@@ -354,11 +379,11 @@
         </div>
         
         <div class="result" id="result">
-            <span class="result-header">🎲 Ziehe am Hebel oder klicke auf "Neue Idee generieren"! 🎲</span>
+            <span class="result-header">🎲 Ziehe am Hebel, klicke auf "Neue Idee generieren" oder drücke die Leertaste! 🎲</span>
         </div>
         <div class="confetti-overlay" id="confetti"></div>
         <div class="buttons">
-            <button id="spinBtn">🎮 Neue Idee generieren</button>
+            <button id="spinBtn">🎮 Neue Idee generieren <span class="keyboard-shortcut">⌨️ Space</span></button>
             <button id="resetBtn">🔄 Zurücksetzen</button>
         </div>
     </div>
@@ -755,11 +780,28 @@
         // Event-Listener für den Hebel
         handle.addEventListener('click', startSpin);
         
+        // Event-Listener für die Leertaste
+        document.addEventListener('keydown', function(event) {
+            // Wenn die Leertaste (keyCode 32) gedrückt wird
+            if (event.keyCode === 32 || event.key === ' ') {
+                // Verhindere das Standardverhalten (Scrollen der Seite)
+                event.preventDefault();
+                // Führe den Spin aus
+                startSpin();
+                
+                // Füge einen visuellen Feedback-Effekt auf den Button hinzu
+                spinBtn.classList.add('active');
+                setTimeout(() => {
+                    spinBtn.classList.remove('active');
+                }, 200);
+            }
+        });
+        
         // Event-Listener für den Reset-Button
         resetBtn.addEventListener('click', () => {
             resetWinningEffects();
             resetReels();
-            result.innerHTML = '<span class="result-header">🎲 Ziehe am Hebel oder klicke auf "Neue Idee generieren"! 🎲</span>';
+            result.innerHTML = '<span class="result-header">🎲 Ziehe am Hebel, klicke auf "Neue Idee generieren" oder drücke die Leertaste! 🎲</span>';
         });
     </script>
 </body>
